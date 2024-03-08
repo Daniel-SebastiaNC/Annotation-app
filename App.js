@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View, AsyncStorage } from 'react-native';
 
 export default function App() {
 
@@ -15,6 +15,36 @@ export default function App() {
     );
 
   }
+
+  useEffect(()=>{
+
+    (async () =>{
+      try{
+        const note = await AsyncStorage.getItem('note')
+        setAnnotation(note)
+      }catch(error){
+
+      }
+
+    })()
+
+  },[])
+
+  setData = async()=>{
+    try{
+      await AsyncStorage.setItem('note', annotation)
+    }catch(error){
+
+    }
+
+    alert('salvo')
+  }
+
+  function atualizar(parametro) {
+    setState(parametro);
+    setData()
+  }
+
    if(state == 'read'){
     return(
       <View style={{height: '100%'}}>
@@ -35,9 +65,9 @@ export default function App() {
         
         {
           (annotation == '')?
-          <TouchableOpacity style={styles.bntAdd} onPress={() => setState('write')}><Text style={styles.bntAddText}>+</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.bntAdd} onPress={() => atualizar('write')}><Text style={styles.bntAddText}>+</Text></TouchableOpacity>
           :
-          <TouchableOpacity style={styles.bntSave} onPress={() => setState('write')}><Text style={styles.bntSaveText}>Editar</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.bntSave} onPress={() => atualizar('write')}><Text style={styles.bntSaveText}>Editar</Text></TouchableOpacity>
         }
 
         
@@ -48,8 +78,8 @@ export default function App() {
       return(
         <View style={{height: '100%'}}>
           <Header></Header>
-          <TextInput value={annotation} numberOfLines={5} multiline={true} onChangeText={(text)=> setAnnotation(text)} style={styles.boxWrite}></TextInput>
-          <TouchableOpacity style={styles.bntSave} onPress={() => setState('read')}><Text style={styles.bntSaveText}>Salvar</Text></TouchableOpacity>
+          <TextInput autoFocus={true} value={annotation} numberOfLines={5} multiline={true} onChangeText={(text)=> setAnnotation(text)} style={styles.boxWrite}></TextInput>
+          <TouchableOpacity style={styles.bntSave} onPress={() => atualizar('read')}><Text style={styles.bntSaveText}>Salvar</Text></TouchableOpacity>
         </View>
       );
     }
